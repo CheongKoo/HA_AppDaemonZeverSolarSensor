@@ -1,8 +1,7 @@
 # HA_AppDaemonZeverSolarSensor
 Get power generation from ZeverSolar Inverter and present it to front end as a sensor for Hass.IO
 
-## This AppDaemon application gets the generated solar power from a ZeverSolar Inverter and presents it to the front end of Hass.IO
-through a component.
+## This AppDaemon application gets the generated solar power from a ZeverSolar Inverter and presents it to the front end of Hass.IO through a component.
 
 **Notes:**
 1) Application is written for AppDaemon 3.
