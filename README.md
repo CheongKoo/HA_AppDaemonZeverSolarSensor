@@ -32,3 +32,6 @@ zeversolar_sensor:
 2) In the Hass.IO, Developer Tools > States, you can see the below:
 ![Image of ZeverSolar entity](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/DeveloperToolsStates.png?raw=true)
 
+**Examples of images:**
+![Image of Graph](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/SolarGenerationGraph.png?raw=true)
+![Image of Daily Generation](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/Daily%20Generated%20Energy.png?raw=true)
