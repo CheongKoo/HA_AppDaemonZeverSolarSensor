@@ -5,6 +5,7 @@ Get power generation from ZeverSolar Inverter and present it to front end as a s
 
 ![Image of Solar Panel](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/ZeverSolar%20Panel.png?raw=true)
 ![Image of Gauge](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/Generated%20power%20gauge.png?raw=true)
+
 **Notes:**
 1) Application is written for AppDaemon 3.
 2) This will supersede my other project [HA_AppDaemonZeverSolar](https://github.com/CheongKoo/HA_AppDaemonZeverSolar) 
@@ -37,3 +38,4 @@ zeversolar_sensor:
 ![Image of Graph](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/SolarGenerationGraph.png?raw=true)
 ![Image of Daily Generation](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/Daily%20Generated%20Energy.png?raw=true)
 
+Enjoy! :+1:
