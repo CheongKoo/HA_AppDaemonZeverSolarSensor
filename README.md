@@ -3,7 +3,7 @@ Get power generation from ZeverSolar Inverter and present it to front end as a s
 
 ## This AppDaemon application gets the generated solar power from a ZeverSolar Inverter and presents it to the front end of Hass.IO through a component.
 
-[Image of Solar Panel](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/ZeverSolar%20Panel.png?raw=true)
+![Image of Solar Panel](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/ZeverSolar%20Panel.png?raw=true)
 
 **Notes:**
 1) Application is written for AppDaemon 3.
