@@ -1,0 +1,6 @@
+# /config/appdaemon/apps/apps.yaml
+---
+
+zeversolar_sensor:
+  module: appd_ZeverSolarSensor
+  class: ZeverSolarSensor
