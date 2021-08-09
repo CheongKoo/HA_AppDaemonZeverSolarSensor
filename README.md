@@ -7,7 +7,7 @@ Get power generation from ZeverSolar Inverter and present it to front end as a s
 ![Image of Gauge](https://github.com/CheongKoo/HA_AppDaemonZeverSolarSensor/blob/master/images/Generated%20power%20gauge.png?raw=true)
 
 **Notes:**
-1) Application is written for AppDaemon 3.
+1) Application is written for AppDaemon 4. (I have modified it for AppDaemon 4 but I can't really remember all the steps.)
 2) This will supersede my other project [HA_AppDaemonZeverSolar](https://github.com/CheongKoo/HA_AppDaemonZeverSolar) 
 as that project uses MQTT. This is a simpler implementation and has no reliance on MQTT.
 3) No changes need to be made to configuration.yaml as the component will appear to the Hass front end once it runs.
@@ -15,7 +15,7 @@ as that project uses MQTT. This is a simpler implementation and has no reliance 
 5) Reading is updated every 2 minutes (and this can be easily changed in the code).
 
 **To implement this sensor:**
-1) Install AppDaemon 3.
+1) Install AppDaemon 4.
 2) Configure AppDaemon and make sure that you can run the helloworld application.
 3) Download this code and put it into the "/config/appdaemon/apps/" folder in your Hass.IO device.
 4) In the code, you need to change the IP address to your ZeverSolar Inverter "zeverSolarURL".
