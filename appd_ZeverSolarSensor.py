@@ -10,11 +10,11 @@
 #              You don't have to make any changes to your configuration.yaml file.
 #              It automatically generates the sensor for the front end.
 #
-#              Note: This was developed for AppDaemon 3
+#              Note: Modified for AppDaemon 4
 #
 # Author:      Cheong Koo
 #
-# Created:     13/04/2020
+# Created:     09/08/2021
 #
 # Note that at night, the server is down as there is no power hence need to check
 # Below the reading from the URL separated by CR
@@ -27,7 +27,7 @@
 #   class: ZeverSolarSensor
 #-------------------------------------------------------------------------------
 
-import appdaemon.plugins.hass.hassapi as hass
+import hassapi as hass
 import urllib.request
 import datetime
 
@@ -58,8 +58,8 @@ class ZeverSolarSensor(hass.Hass):
     #---------------------------------------------------------------------
     #-- Initialise the module
     def initialize(self):
-        self.log("------------------------------------------------")
-        self.log("Initiatilize: ZeverSolar Sensor")
+        self.log("------------------------------------------------", log="main_log")
+        self.log("Initiatilize: ZeverSolar Sensor", log="main_log")
         #-- Intialise some local variables
         self.generatedPower = 0.00 # In kW
         self.totalEnergyDaily = 0.00 # In KwH
@@ -73,7 +73,7 @@ class ZeverSolarSensor(hass.Hass):
     #---------------------------------------------------------------------
     #-- Get generation and send out as sensor
     def doGetGenAndSendAsSensor(self, arg):
-        self.log("----- ZeverSolar sensor callback -----")
+        self.log("----- ZeverSolar sensor callback -----", log="main_log")
         #-- Get the generated power & energy
         self.requestSolarGeneration(self)
         lastUpdated = self.dateOfReading.strftime(datetimeFormat) # Last updated
@@ -84,7 +84,7 @@ class ZeverSolarSensor(hass.Hass):
                        {"unit_of_measurement": "kW", \
                         "device_class": "power", \
                         "icon": "mdi:white-balance-sunny", \
-                        "friendly_name": "ZeverSolar Instantaneous Generated Power",
+                        "friendly_name": "Generated Power",
                         "lastUpdated": lastUpdated
                        })
         #-- Daily energy generated
@@ -94,11 +94,11 @@ class ZeverSolarSensor(hass.Hass):
                        {"unit_of_measurement": "kWh", \
                         "device_class": "power", \
                         "icon": "mdi:white-balance-sunny", \
-                        "friendly_name": "ZeverSolar Daily Generated Energy",
+                        "friendly_name": "Daily Generated Energy",
                         "lastUpdated": lastUpdated
                        })
         #-- Send out a log to the appdaemon console
-        self.log("Updated: " + lastUpdated + " Gen: " + stateInfo1 + "kW, Daily energy: " + stateInfo2 + "kWh")
+        self.log("Updated: " + lastUpdated + " Gen: " + stateInfo1 + "kW, Daily energy: " + stateInfo2 + "kWh", log="main_log")
 
     #---------------------------------------------------------------------
     #-- Gets the reading from the URL. Returns 0 if no generation
@@ -118,7 +118,7 @@ class ZeverSolarSensor(hass.Hass):
             self.totalEnergyDaily = float(dailyEnergy) # It is already in kWh eg. 14.52
             return
         except:
-            self.log("Error in connecting to Zever solar server")
+            self.log("Error in connecting to Zever solar server", log="main_log")
             self.generatedPower = 0.00
             self.totalEnergyDaily = 0.00
             return
