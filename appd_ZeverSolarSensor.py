@@ -82,7 +82,9 @@ class ZeverSolarSensor(hass.Hass):
         stateInfo1 = generationFormat.format(self.generatedPower)
         self.set_state("sensor.zeverSolar_generated_power", state=stateInfo1, attributes=\
                        {"unit_of_measurement": "kW", \
-                        "device_class": "power", \
+                        "last_reset" : "1970-01-01T00:00:00+00:00", \
+                        "state_class": "measurement", \
+                        "device_class": "energy", \
                         "icon": "mdi:white-balance-sunny", \
                         "friendly_name": "Generated Power",
                         "lastUpdated": lastUpdated
@@ -92,7 +94,9 @@ class ZeverSolarSensor(hass.Hass):
         stateInfo2 = generationFormat.format(self.totalEnergyDaily)
         self.set_state("sensor.zeverSolar_daily_energy", state=stateInfo2, attributes=\
                        {"unit_of_measurement": "kWh", \
-                        "device_class": "power", \
+                        "last_reset" : "1970-01-01T00:00:00+00:00", \
+                        "state_class": "measurement", \
+                        "device_class": "energy", \
                         "icon": "mdi:white-balance-sunny", \
                         "friendly_name": "Daily Generated Energy",
                         "lastUpdated": lastUpdated
