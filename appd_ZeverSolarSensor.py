@@ -42,13 +42,35 @@ from datetime import timedelta
 # Global constants
 # Get the below from Router
 #-------------------------------------------------------------------------------
-zeverSolarURL = "http://192.168.201.199/home.cgi"  # Change this to your ZeverSolar Inverter IP address
+#zeverSolarURL = "http://192.168.201.199/home.cgi"  # Change this to your ZeverSolar Inverter IP address
 datetimeFormat = "%d/%m/%Y %H:%M" # Format for strftime()
 generationFormat = "{:.2f}"
 refreshInterval = 120 # Time interval to read the URL in seconds
 genPowerIndex = 11 # Index into the returned string from the URL
 dailyEnergyIndex = 12 # Index into returned string from the URL
 
+#-------------------------------------------------------------------------------
+# Inverter Class
+#-------------------------------------------------------------------------------
+class inverter:
+
+    def __init__(self, name, ipaddr, generatedPower, totalEnergyDaily):
+        self.name = name
+        self.ipaddr = ipaddr
+        self.http_addr = "http://" + ipaddr + "/home.cgi"
+        self.power = generatedPower
+        self.energy = totalEnergyDaily
+
+#-------------------------------------------------------------------------------
+# Create inverter instances
+#-------------------------------------------------------------------------------
+inv01 = inverter('garage_west_oben', '192.168.201.199', 0, 0.0)
+inv02 = inverter('garage_west_unten', '192.168.201.76', 0, 0.0)
+
+#-------------------------------------------------------------------------------
+# Create inverter Array variable
+#-------------------------------------------------------------------------------
+inv = [inv01, inv02]
 
 #-------------------------------------------------------------------------------
 # Class to be called by AppDaemon
@@ -75,43 +97,46 @@ class ZeverSolarSensor(hass.Hass):
     def doGetGenAndSendAsSensor(self, arg):
         self.log("----- ZeverSolar sensor callback -----", log="main_log")
         #-- Get the generated power & energy
-        self.requestSolarGeneration(self)
-        lastUpdated = self.dateOfReading.strftime(datetimeFormat) # Last updated
-        lastReset = self.dateOfReading.strftime("%Y-%m-%d 00:00:00+02:00")
-        #-- Output the sensor values
-        #-- Instantaneous Generated power
-        stateInfo1 = generationFormat.format(self.generatedPower)
-        self.set_state("sensor.zeverSolar_generated_power", state=stateInfo1, attributes=\
-                       {"unit_of_measurement": "W", \
-                        #-- "last_reset" : "1970-01-01T00:00:00+00:00", \
-                        "last_reset" : lastReset, \
-                        "state_class": "measurement", \
-                        "device_class": "power", \
-                        "icon": "mdi:white-balance-sunny", \
-                        "friendly_name": "Generated Power",
-                        "lastUpdated": lastUpdated
-                       })
-        #-- Daily energy generated
-        #- Icons are located at http://materialdesignicons.com/
-        stateInfo2 = generationFormat.format(self.totalEnergyDaily)
-        self.set_state("sensor.zeverSolar_daily_energy", state=stateInfo2, attributes=\
-                       {"unit_of_measurement": "kWh", \
-                        #-- "last_reset" : "1970-01-01T00:00:00+00:00", \
-                        "last_reset" : lastReset, \
-                        "state_class": "total_increasing", \
-                        "device_class": "energy", \
-                        "icon": "mdi:white-balance-sunny", \
-                        "friendly_name": "Daily Generated Energy",
-                        "lastUpdated": lastUpdated
-                       })
-        #-- Send out a log to the appdaemon console
-        self.log("Updated: " + lastUpdated + " Gen: " + stateInfo1 + "W, Daily energy: " + stateInfo2 + "kWh", log="main_log")
+
+        for inverters in inv:
+
+            self.requestSolarGeneration(self, inverters)
+            lastUpdated = self.dateOfReading.strftime(datetimeFormat) # Last updated
+            lastReset = self.dateOfReading.strftime("%Y-%m-%d 00:00:00+02:00")
+            #-- Output the sensor values
+            #-- Instantaneous Generated power
+            stateInfo1 = generationFormat.format(inverters.power)
+            self.set_state("sensor." + inverters.name +"_generated_power", state=stateInfo1, attributes=\
+                           {"unit_of_measurement": "W", \
+                            #-- "last_reset" : "1970-01-01T00:00:00+00:00", \
+                            "last_reset" : lastReset, \
+                            "state_class": "measurement", \
+                            "device_class": "power", \
+                            "icon": "mdi:white-balance-sunny", \
+                            "friendly_name": "Generated Power",
+                            "lastUpdated": lastUpdated
+                           })
+            #-- Daily energy generated
+            #- Icons are located at http://materialdesignicons.com/
+            stateInfo2 = generationFormat.format(inverters.energy)
+            self.set_state("sensor." + inverters.name + "_daily_energy", state=stateInfo2, attributes=\
+                           {"unit_of_measurement": "kWh", \
+                            #-- "last_reset" : "1970-01-01T00:00:00+00:00", \
+                            "last_reset" : lastReset, \
+                            "state_class": "total_increasing", \
+                            "device_class": "energy", \
+                            "icon": "mdi:white-balance-sunny", \
+                            "friendly_name": "Daily Generated Energy",
+                            "lastUpdated": lastUpdated
+                           })
+            #-- Send out a log to the appdaemon console
+            self.log("Updated: " + lastUpdated + " Gen: " + stateInfo1 + "W, Daily energy: " + stateInfo2 + "kWh", log="main_log")
 
     #---------------------------------------------------------------------
     #-- Gets the reading from the URL. Returns 0 if no generation
-    def requestSolarGeneration(self, arg):
+    def requestSolarGeneration(self, *args):
         self.dateOfReading = datetime.now() # Get date & time of reading
-        req = Request(zeverSolarURL)
+        req = Request(args.http_addr)
         try:
             response = urlopen(req)
             htmlresponse = response.read()
@@ -121,12 +146,12 @@ class ZeverSolarSensor(hass.Hass):
             genPower = st[genPowerIndex]
             dailyEnergy = st[dailyEnergyIndex]
             #-- Convert string into Int and Float
-            self.generatedPower = int(genPower) # Its in W eg. 4978. Convert into kW
+            args.power = int(genPower) # Its in W eg. 4978. Convert into kW
             #self.generatedPower = float(genPower)/1000 # Its in W eg. 4978. Convert into kW
-            self.totalEnergyDaily = float(dailyEnergy) # It is already in kWh eg. 14.52
+            args.energy = float(dailyEnergy) # It is already in kWh eg. 14.52
             return
         except:
             self.log("Error in connecting to Zever solar server", log="main_log")
-            self.generatedPower = 0
-            self.totalEnergyDaily = None
+            args.power = 0
+            args.energy = None
             return
