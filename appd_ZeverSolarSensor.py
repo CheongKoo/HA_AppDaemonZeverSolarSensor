@@ -24,7 +24,7 @@
 # In your "apps.yaml" file, put the following lines
 # zeversolar_sensor:
 #   module: appd_ZeverSolarSensor
-#   class: ZeverSolarSensor
+#   class: ZeverSolarSensorAll
 #-------------------------------------------------------------------------------
 
 import hassapi as hass
