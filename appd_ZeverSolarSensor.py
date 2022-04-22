@@ -151,4 +151,4 @@ class ZeverSolarSensorAll(hass.Hass):
                             "lastUpdated": lastUpdated
                             })
             #-- Send out a log to the appdaemon console
-            self.log("Updated: " + lastUpdated + " Gen: " + stateInfo1 + "W, Daily energy: " + stateInfo2 + "kWh", log="main_log")
+            self.log("Updated: " + inverters.name + " at " + lastUpdated + " Gen: " + stateInfo1 + "W, Daily energy: " + stateInfo2 + "kWh", log="main_log")
