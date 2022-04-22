@@ -42,7 +42,7 @@ from datetime import timedelta
 # Global constants
 # Get the below from Router
 #-------------------------------------------------------------------------------
-zeverSolarURL = "http://192.168.1.148/home.cgi"  # Change this to your ZeverSolar Inverter IP address
+zeverSolarURL = "http://192.168.201.199/home.cgi"  # Change this to your ZeverSolar Inverter IP address
 datetimeFormat = "%d/%m/%Y %H:%M" # Format for strftime()
 generationFormat = "{:.2f}"
 refreshInterval = 120 # Time interval to read the URL in seconds
@@ -61,7 +61,7 @@ class ZeverSolarSensor(hass.Hass):
         self.log("------------------------------------------------", log="main_log")
         self.log("Initiatilize: ZeverSolar Sensor", log="main_log")
         #-- Intialise some local variables
-        self.generatedPower = 0.00 # In kW
+        self.generatedPower = 0 # In W
         self.totalEnergyDaily = 0.00 # In KwH
         self.dateOfReading = datetime.now()
         #-- Run first time in 5 sec
@@ -77,11 +77,15 @@ class ZeverSolarSensor(hass.Hass):
         #-- Get the generated power & energy
         self.requestSolarGeneration(self)
         lastUpdated = self.dateOfReading.strftime(datetimeFormat) # Last updated
+        lastReset = self.dateOfReading.strftime("%Y-%m-%d 00:00:00+02:00")
         #-- Output the sensor values
         #-- Instantaneous Generated power
         stateInfo1 = generationFormat.format(self.generatedPower)
         self.set_state("sensor.zeverSolar_generated_power", state=stateInfo1, attributes=\
-                       {"unit_of_measurement": "kW", \
+                       {"unit_of_measurement": "W", \
+                        #-- "last_reset" : "1970-01-01T00:00:00+00:00", \
+                        "last_reset" : lastReset, \
+                        "state_class": "measurement", \
                         "device_class": "power", \
                         "icon": "mdi:white-balance-sunny", \
                         "friendly_name": "Generated Power",
@@ -92,13 +96,16 @@ class ZeverSolarSensor(hass.Hass):
         stateInfo2 = generationFormat.format(self.totalEnergyDaily)
         self.set_state("sensor.zeverSolar_daily_energy", state=stateInfo2, attributes=\
                        {"unit_of_measurement": "kWh", \
-                        "device_class": "power", \
+                        #-- "last_reset" : "1970-01-01T00:00:00+00:00", \
+                        "last_reset" : lastReset, \
+                        "state_class": "total_increasing", \
+                        "device_class": "energy", \
                         "icon": "mdi:white-balance-sunny", \
                         "friendly_name": "Daily Generated Energy",
                         "lastUpdated": lastUpdated
                        })
         #-- Send out a log to the appdaemon console
-        self.log("Updated: " + lastUpdated + " Gen: " + stateInfo1 + "kW, Daily energy: " + stateInfo2 + "kWh", log="main_log")
+        self.log("Updated: " + lastUpdated + " Gen: " + stateInfo1 + "W, Daily energy: " + stateInfo2 + "kWh", log="main_log")
 
     #---------------------------------------------------------------------
     #-- Gets the reading from the URL. Returns 0 if no generation
@@ -114,12 +121,12 @@ class ZeverSolarSensor(hass.Hass):
             genPower = st[genPowerIndex]
             dailyEnergy = st[dailyEnergyIndex]
             #-- Convert string into Int and Float
-            self.generatedPower = float(genPower)/1000 # Its in W eg. 4978. Convert into kW
+            self.generatedPower = int(genPower) # Its in W eg. 4978. Convert into kW
+            #self.generatedPower = float(genPower)/1000 # Its in W eg. 4978. Convert into kW
             self.totalEnergyDaily = float(dailyEnergy) # It is already in kWh eg. 14.52
             return
         except:
             self.log("Error in connecting to Zever solar server", log="main_log")
-            self.generatedPower = 0.00
-            self.totalEnergyDaily = 0.00
+            self.generatedPower = 0
+            self.totalEnergyDaily = None
             return
-
