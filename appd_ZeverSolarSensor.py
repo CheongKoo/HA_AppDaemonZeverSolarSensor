@@ -23,8 +23,8 @@
 #
 # In your "apps.yaml" file, put the following lines
 # zeversolar_sensor:
-#   module: appd_ZeverSolarSensor
-#   class: ZeverSolarSensor
+#   module: appd_ZeverSolarSensorAll
+#   class: ZeverSolarSensorAll
 #-------------------------------------------------------------------------------
 
 import hassapi as hass
@@ -42,7 +42,6 @@ from datetime import timedelta
 # Global constants
 # Get the below from Router
 #-------------------------------------------------------------------------------
-#zeverSolarURL = "http://192.168.201.199/home.cgi"  # Change this to your ZeverSolar Inverter IP address
 datetimeFormat = "%d/%m/%Y %H:%M" # Format for strftime()
 generationFormat = "{:.2f}"
 refreshInterval = 60 # Time interval to read the URL in seconds
