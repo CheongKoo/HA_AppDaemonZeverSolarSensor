@@ -24,7 +24,7 @@
 # In your "apps.yaml" file, put the following lines
 # zeversolar_sensor:
 #   module: appd_ZeverSolarSensor
-#   class: ZeverSolarSensorAll
+#   class: ZeverSolarSensor
 #-------------------------------------------------------------------------------
 
 import hassapi as hass
@@ -42,9 +42,10 @@ from datetime import timedelta
 # Global constants
 # Get the below from Router
 #-------------------------------------------------------------------------------
+#zeverSolarURL = "http://192.168.201.199/home.cgi"  # Change this to your ZeverSolar Inverter IP address
 datetimeFormat = "%d/%m/%Y %H:%M" # Format for strftime()
 generationFormat = "{:.2f}"
-refreshInterval = 120 # Time interval to read the URL in seconds
+refreshInterval = 60 # Time interval to read the URL in seconds
 genPowerIndex = 11 # Index into the returned string from the URL
 dailyEnergyIndex = 12 # Index into returned string from the URL
 
@@ -53,8 +54,9 @@ dailyEnergyIndex = 12 # Index into returned string from the URL
 #-------------------------------------------------------------------------------
 class inverter:
 
-    def __init__(self, name, ipaddr, generatedPower, totalEnergyDaily):
+    def __init__(self, name, friendlyname, ipaddr, generatedPower, totalEnergyDaily):
         self.name = name
+        self.friendlyname = friendlyname
         self.ipaddr = ipaddr
         self.httpaddr = "http://" + ipaddr + "/home.cgi"
         self.power = generatedPower
@@ -64,11 +66,12 @@ class inverter:
 # Create inverter instances
 # invXX = inverter('name', 'ipaddress'; 0, 0.0)
 #-------------------------------------------------------------------------------
-inv01 = inverter('garage_west_oben', '192.168.201.199', 0, 0.0)
-inv02 = inverter('garage_west_unten', '192.168.201.76', 0, 0.0)
+inv01 = inverter('garage_west_oben', 'Garage West Oben', '192.168.201.199', 0, 0.0)
+inv02 = inverter('garage_west_unten', 'Garage West Unten', '192.168.201.76', 0, 0.0)
+#inv03 = inverter('garage_ost_oben', 'Garage Ost Oben', '192.168.201.76', 0, 0.0)
 
 #-------------------------------------------------------------------------------
-# Create inverter List variable
+# Create inverter Array variable
 #-------------------------------------------------------------------------------
 inv = [inv01, inv02]
 
@@ -81,7 +84,7 @@ class ZeverSolarSensorAll(hass.Hass):
     #-- Initialise the module
     def initialize(self):
         self.log("------------------------------------------------", log="main_log")
-        self.log("Initiatilize: ZeverSolar Sensor", log="main_log")
+        self.log("Initiatilize: ZeverSolar Sensor All", log="main_log")
         #-- Intialise some local variables
         self.generatedPower = 0 # In W
         self.totalEnergyDaily = 0.00 # In KwH
@@ -101,7 +104,7 @@ class ZeverSolarSensorAll(hass.Hass):
         for inverters in inv:
             # -- Get the generated power & energy
             #self.requestSolarGeneration(inverters.httpaddr)
-
+            self.log("Calling: " + inverters.friendlyname , log="main_log")
             self.dateOfReading = datetime.now()  # Get date & time of reading
             req = Request(inverters.httpaddr)
             try:
@@ -113,11 +116,11 @@ class ZeverSolarSensorAll(hass.Hass):
                 genPower = st[genPowerIndex]
                 dailyEnergy = st[dailyEnergyIndex]
                 # -- Convert string into Int and Float
-                inverters.power = int(genPower)  # Its in W eg. 4978
+                inverters.power = int(genPower)  # Its in W eg. 4978. Convert into kW
                 # self.generatedPower = float(genPower)/1000 # Its in W eg. 4978. Convert into kW
                 inverters.energy = float(dailyEnergy)  # It is already in kWh eg. 14.52
             except:
-                self.log("Error in connecting to Zever solar server", log="main_log")
+                self.log("Error in connecting to " + inverters.friendlyname, log="main_log")
                 inverters.power = 0
                 inverters.energy = None
 
@@ -134,7 +137,7 @@ class ZeverSolarSensorAll(hass.Hass):
                             "state_class": "measurement", \
                             "device_class": "power", \
                             "icon": "mdi:white-balance-sunny", \
-                            "friendly_name": "Generated Power",
+                            "friendly_name": inverters.friendlyname + " Generated Power",
                             "lastUpdated": lastUpdated
                              })
             #-- Daily energy generated
@@ -147,7 +150,7 @@ class ZeverSolarSensorAll(hass.Hass):
                             "state_class": "total_increasing", \
                             "device_class": "energy", \
                             "icon": "mdi:white-balance-sunny", \
-                            "friendly_name": "Daily Generated Energy",
+                            "friendly_name": inverters.friendlyname + " Daily Generated Energy",
                             "lastUpdated": lastUpdated
                             })
             #-- Send out a log to the appdaemon console
